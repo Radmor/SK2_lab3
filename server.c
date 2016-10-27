@@ -16,7 +16,7 @@
 #include <time.h>
 #include <pthread.h>
 
-const int max_clients_amount=3;
+#define max_clients_amount 3
 
 int current_clients_amount=0;
 
@@ -27,9 +27,13 @@ int sockets[max_clients_amount];
 void spread_message(char* message, int sender_id){
     int i;
     for(i=0;i<current_clients_amount;i++){
-        /*char buffer[100];
-        int n= sprintf(buffer, "%s %d\n","Uzytkownik:",id);
-        write(client_socket, buffer, n);*/
+
+
+        if(i!=sender_id){
+            char buffer[100];
+            int n= sprintf(buffer, "%s\n",message);
+            write(i, buffer, n);
+        }
 
         printf("%s",message);
 
@@ -121,6 +125,9 @@ int main(){
         struct Thread_data_t data;
         data.socket=client_socket;
         data.id=id;
+
+
+        sockets[id]=client_socket;
 
         pthread_create(&id, NULL, client_loop, (void *)&data);
 
