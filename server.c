@@ -35,7 +35,7 @@ void spread_message(char* message, int sender_id){
         if(i!=sender_id){
             char buffer[100];
             int n= sprintf(buffer, "%s\n",message);
-            write(i, buffer, n);
+            write(sockets[i], buffer, n);
         }
 
 
@@ -75,15 +75,17 @@ void* client_loop(void *t_data) {
 
 }
 int QUEUE_SIZE=5;
-int SERVER_PORT= 1235;
+int SERVER_PORT= 1236;
 
 
 int main(){
 
     int is_running=1;
 
-    pthread_t id;
-    id=0;
+    pthread_t handles[max_clients_amount];
+
+    int id=0;
+
 
     struct sockaddr_in address,client_address;
 
@@ -114,9 +116,6 @@ int main(){
 
         char buffer[100];
 
-
-
-
         int n= sprintf(buffer, "%s %d\n","Uzytkownik:",id);
 
 
@@ -129,7 +128,7 @@ int main(){
 
         sockets[id]=client_socket;
 
-        pthread_create(&id, NULL, client_loop, (void *)&data);
+        pthread_create(&handles[id], NULL, client_loop, (void *)&data);
 
 
 

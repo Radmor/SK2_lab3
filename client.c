@@ -57,7 +57,7 @@ int main()
 
     struct sockaddr_in address;
     address.sin_family = AF_INET;
-    address.sin_port = htons(1235);
+    address.sin_port = htons(1236);
     //printf("%s\n", host->h_name);
     //printf("%s\n", host->h_addr_list[0]);
     //printf("%s\n", host->h_addr);
