@@ -26,6 +26,9 @@ int sockets[max_clients_amount];
 
 void spread_message(char* message, int sender_id){
     int i;
+
+    printf("%s",message);
+
     for(i=0;i<current_clients_amount;i++){
 
 
@@ -35,7 +38,7 @@ void spread_message(char* message, int sender_id){
             write(i, buffer, n);
         }
 
-        printf("%s",message);
+
 
     }
 }
@@ -61,7 +64,7 @@ void* client_loop(void *t_data) {
     while (rcvd = recv(sck, buffer, 1024, 0)) {
         send(sck, buffer, rcvd, 0);
 
-        printf("%s",buffer);
+        //printf("%s",buffer);
         spread_message(buffer,id);
 
     }
@@ -72,7 +75,7 @@ void* client_loop(void *t_data) {
 
 }
 int QUEUE_SIZE=5;
-int SERVER_PORT= 1234;
+int SERVER_PORT= 1235;
 
 
 int main(){
@@ -115,9 +118,6 @@ int main(){
 
 
         int n= sprintf(buffer, "%s %d\n","Uzytkownik:",id);
-
-
-
 
 
         write(client_socket, buffer, n);

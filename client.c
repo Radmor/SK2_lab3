@@ -14,6 +14,37 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <time.h>
+#include <pthread.h>
+
+
+struct Thread_data_t
+{
+    int socket;
+};
+
+void* listen_loop(void *t_data) {
+
+    int rcvd;
+    char buffer[1204];
+
+    struct Thread_data_t data=*(struct Thread_data_t *)t_data;
+
+    int sck=data.socket;
+    //int id=data.id;
+
+    while (rcvd = recv(sck, buffer, 1024, 0)) {
+        //send(sck, buffer, rcvd, 0);
+
+        printf("%s",buffer);
+        //spread_message(buffer,id);
+
+    }
+
+    close(sck);
+
+    pthread_exit(NULL);
+
+}
 
 int main()
 {
@@ -26,7 +57,7 @@ int main()
 
     struct sockaddr_in address;
     address.sin_family = AF_INET;
-    address.sin_port = htons(1234);
+    address.sin_port = htons(1235);
     //printf("%s\n", host->h_name);
     //printf("%s\n", host->h_addr_list[0]);
     //printf("%s\n", host->h_addr);
@@ -45,6 +76,13 @@ int main()
 
     char buffer[100];
 
+
+    struct Thread_data_t data;
+    data.socket=s_desc;
+
+    pthread_t id=0;
+
+    pthread_create(&id, NULL, listen_loop, (void *)&data);
 
     while(1){
         scanf("%s",buf);
