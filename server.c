@@ -18,54 +18,48 @@
 
 #define max_clients_amount 3
 
-int current_clients_amount=0;
+int current_clients_amount = 0;
 
 int sockets[max_clients_amount];
 
 
-
-void spread_message(char* message, int sender_id){
+void spread_message(char *message, int sender_id) {
     int i;
 
-    printf("%s",message);
+    printf("%s", message);
 
-    for(i=0;i<current_clients_amount;i++){
+    for (i = 0; i < current_clients_amount; i++) {
 
 
-        if(i!=sender_id){
-            char buffer[100];
-            int n= sprintf(buffer, "%s\n",message);
-            write(sockets[i], buffer, n);
-        }
-
+        char buffer[100];
+        int n = sprintf(buffer, "%s\n", message);
+        write(sockets[i], buffer, n);
 
 
     }
 }
 
-struct Thread_data_t
-{
+struct Thread_data_t {
     int socket;
     int id;
 };
 
-void* client_loop(void *t_data) {
-
+void *client_loop(void *t_data) {
 
 
     int rcvd;
     char buffer[1204];
 
-    struct Thread_data_t data=*(struct Thread_data_t *)t_data;
+    struct Thread_data_t data = *(struct Thread_data_t *) t_data;
 
-    int sck=data.socket;
-    int id=data.id;
+    int sck = data.socket;
+    int id = data.id;
 
     while (rcvd = recv(sck, buffer, 1024, 0)) {
         send(sck, buffer, rcvd, 0);
 
         //printf("%s",buffer);
-        spread_message(buffer,id);
+        spread_message(buffer, id);
 
     }
 
@@ -74,69 +68,66 @@ void* client_loop(void *t_data) {
     pthread_exit(NULL);
 
 }
-int QUEUE_SIZE=5;
-int SERVER_PORT= 1236;
+
+int QUEUE_SIZE = 5;
+int SERVER_PORT = 1239;
 
 
-int main(){
+int main() {
 
-    int is_running=1;
+    int is_running = 1;
 
     pthread_t handles[max_clients_amount];
 
-    int id=0;
+    int id = 0;
 
 
-    struct sockaddr_in address,client_address;
+    struct sockaddr_in address, client_address;
 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = htonl(INADDR_ANY);
     address.sin_port = htons(SERVER_PORT);
 
 
-    int my_socket = socket(AF_INET,SOCK_STREAM,0);
-    bind(my_socket, (struct sockaddr*)&address, sizeof(struct sockaddr));
+    int my_socket = socket(AF_INET, SOCK_STREAM, 0);
+    bind(my_socket, (struct sockaddr *) &address, sizeof(struct sockaddr));
 
-    int foo=1;
+    int foo = 1;
 
-    setsockopt(my_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&foo, sizeof(foo));
-
+    setsockopt(my_socket, SOL_SOCKET, SO_REUSEADDR, (char *) &foo, sizeof(foo));
 
 
     listen(my_socket, QUEUE_SIZE);
 
-    while(is_running) {
+    while (is_running) {
 
         int nTmp = sizeof(struct sockaddr);
-        int client_socket = accept(my_socket, (struct sockaddr*)&client_address, &nTmp);
+        int client_socket = accept(my_socket, (struct sockaddr *) &client_address, &nTmp);
 
         printf("POLACZENIE\n");
 
 
-
         char buffer[100];
 
-        int n= sprintf(buffer, "%s %d\n","Uzytkownik:",id);
+        int n = sprintf(buffer, "%s %d\n", "Uzytkownik:", id);
 
 
         write(client_socket, buffer, n);
 
         struct Thread_data_t data;
-        data.socket=client_socket;
-        data.id=id;
+        data.socket = client_socket;
+        data.id = id;
 
 
-        sockets[id]=client_socket;
+        sockets[id] = client_socket;
 
-        pthread_create(&handles[id], NULL, client_loop, (void *)&data);
-
+        pthread_create(&handles[id], NULL, client_loop, (void *) &data);
 
 
         id++;
         current_clients_amount++;
 
     }
-
 
 
 }
