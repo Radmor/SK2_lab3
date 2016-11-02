@@ -17,6 +17,8 @@
 #include <pthread.h>
 
 
+const int PORT=1237;
+
 struct Thread_data_t
 {
     int socket;
@@ -57,7 +59,7 @@ int main()
 
     struct sockaddr_in address;
     address.sin_family = AF_INET;
-    address.sin_port = htons(1239);
+    address.sin_port = htons(PORT);
     //printf("%s\n", host->h_name);
     //printf("%s\n", host->h_addr_list[0]);
     //printf("%s\n", host->h_addr);

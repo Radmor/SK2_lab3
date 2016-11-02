@@ -18,6 +18,9 @@
 
 #define max_clients_amount 3
 
+
+int SERVER_PORT = 1237;
+
 int current_clients_amount = 0;
 
 int sockets[max_clients_amount];
@@ -30,10 +33,12 @@ void spread_message(char *message, int sender_id) {
 
     for (i = 0; i < current_clients_amount; i++) {
 
+        if(i!=sender_id){
+            char buffer[100];
+            int n = sprintf(buffer, "%s\n", message);
+            write(sockets[i], buffer, n);
+        }
 
-        char buffer[100];
-        int n = sprintf(buffer, "%s\n", message);
-        write(sockets[i], buffer, n);
 
 
     }
@@ -56,7 +61,7 @@ void *client_loop(void *t_data) {
     int id = data.id;
 
     while (rcvd = recv(sck, buffer, 1024, 0)) {
-        send(sck, buffer, rcvd, 0);
+        //send(sck, buffer, rcvd, 0);
 
         //printf("%s",buffer);
         spread_message(buffer, id);
@@ -70,7 +75,7 @@ void *client_loop(void *t_data) {
 }
 
 int QUEUE_SIZE = 5;
-int SERVER_PORT = 1239;
+
 
 
 int main() {
